@@ -7,22 +7,27 @@ const bcrypt = require('bcrypt');
 
 function initialize(passport) {
     const autheticateUser = (username, password, done) => {
+        // if (username.isEmpty()){
+        //     return done(null, false, {message : "Tolong isi username"});
+        // }
+        // if (password.isEmpty()){
+        //     return  done(null, false, {message : "Tolong isi password"});
+        // }
         Users.findOne({
             where: {username: username}
         })
         .then(result => {
-            console.log(result);
+            
             if (result) {
-                const user = result;
 
-                bcrypt.compare(password, user.password, (err, isMatch) => {
+                bcrypt.compare(password, result.password, (err, isMatch) => {
                     if (err) {
                         console.log(err);
                     }
                     if (isMatch) {
-                        return done(null, user, {
+                        return done(null, result, {
 
-                            message: `Berhasil Login Selemat Datang ${user.username}`
+                            message: `Berhasil Login Selemat Datang ${result.username}`
                         });
                     } else {
                         
@@ -41,6 +46,7 @@ function initialize(passport) {
         .catch(err => {
             throw err;
         });
+
     }
 
     passport.use(

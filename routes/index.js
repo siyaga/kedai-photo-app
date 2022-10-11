@@ -13,18 +13,7 @@ const {
 } = require('express-validator');
 
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express', users: authUser(req.user) });
-});
 
-router.get('/register', function (req, res, next) {
-  username = req.session.username;
-  res.render('register', {
-    title: 'Register User',
-    users: authUser(req.user)
-  });
-})
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, callback) => {
@@ -40,8 +29,11 @@ const kirim = multer({
 });
 
 const db = require('../models');
+const { authenticate } = require('passport');
 const Users = db.users;
 const Op = db.Sequelize.Op;
+
+
 
 // Membuat Proses menuju login Page 
 router.get('/login', checkAuthenticated, (req, res) => {
@@ -66,6 +58,34 @@ function authUser(req) {
 
   }
 }
+
+/* GET home page. */
+router.get('/',checkNotAuthenticated, function(req, res, next) {
+  res.render('index', { title: 'Example', users: authUser(req.user) });
+});
+
+/* GET Pembeli page. */
+router.get('/pembeli',checkNotAuthenticated, pembeliRoleIs, function(req, res, next) {
+  res.render('pembeli', { title: 'Pembeli', users: authUser(req.user) });
+});
+
+/* GET Penjual page. */
+router.get('/penjual',checkNotAuthenticated, penjualRoleIs, function(req, res, next) {
+  res.render('penjual', { title: 'Penjual', users: authUser(req.user) });
+});
+
+/* GET Admin page. */
+router.get('/admin',checkNotAuthenticated, adminRoleIs, function(req, res, next) {
+  res.render('admin', { title: 'Admin', users: authUser(req.user) });
+});
+
+router.get('/register', function (req, res, next) {
+  username = req.session.username;
+  res.render('register', {
+    title: 'Register User',
+    users: authUser(req.user)
+  });
+});
 
 
 // create Berita
@@ -249,18 +269,21 @@ function adminRoleIs(req, res, next) {
   if (req.user.role === "admin") {
       return next();
   }
+  return res.redirect('/');
 }
 // Function Membuat Middleware Role user dan admin
 function pembeliRoleIs(req, res, next) {
   if (req.user.role == "pembeli" || req.user.role === "admin") {
     return next();
   }
+  return res.redirect('/');
 
 }
 function penjualRoleIs(req, res, next) {
   if (req.user.role == "penjual" || req.user.role === "admin") {
     return next();
   }
+  return res.redirect('/');
 
 }
 
