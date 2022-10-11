@@ -80,7 +80,6 @@ router.get('/admin',checkNotAuthenticated, adminRoleIs, function(req, res, next)
 });
 
 router.get('/register', function (req, res, next) {
-  username = req.session.username;
   res.render('register', {
     title: 'Register User',
     users: authUser(req.user)
@@ -156,11 +155,6 @@ router.post('/register', [
     return true;
   })
 
-
-
-
-
-
 ], function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -197,57 +191,95 @@ router.post('/register', [
 
 });
 
-// /* GET users listing. */
-// router.get('/login', notauth, function (req, res, next) {
-//   username = req.session.username;
+router.get('/profile',checkNotAuthenticated, function (req, res, next) {
+  res.render('profile', {
+    title: 'Edit Profile',
+    users: authUser(req.user)
+  });
+});
+
+
+// create Berita
+router.post('/profile',checkNotAuthenticated, [
+  check('nama')
+  .notEmpty().withMessage('Nama harus diisi.'),
+  body('email').custom(async (valueEmail,[
+    req
+  ] ) => {
+
+    // Mencari nama yang sama di query
+
+    const Email = await Users.findOne({
+      where: {
+        email: valueEmail
+      }
+    });
+    if (valueEmail !== req.body.oldEmail && Email) {
+      throw new Error(`Email ${valueEmail} sudah terdaftar! `);
+
+    }
+
+    return true;
+  })
+  .notEmpty().withMessage('Email harus diisi.')
+  .isEmail().withMessage('Email tidak valid.'),
+  body('username').custom(async (valueUsername, {req }) => {
+    // Mencari nama yang sama di query
+    const username = await Users.findOne({
+      where: {
+        username: valueUsername
+      }
+    });
+
+
+    if (valueUsername !== req.body.oldUsername && username) {
+      throw new Error(`Username ${valueUsername} sudah terdaftar! `);
+
+    }
+
+    return true;
+  })
+  .notEmpty().withMessage('Username harus diisi.')
+  .isLength({
+    max: 20
+  }).withMessage('Username maximal Harus 20 karakter.'),
   
-//   res.render('login', {
-//     title: 'Login User',
-//     username: username,
-//     msg: req.flash('msg')
-//   });
-// });
 
+], function (req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.render('profile', {
+      title: 'Edit Profile',
+      errors: errors.array(),
+      data: req.body,
+      users: authUser(req.user)
+    });
+  } else {
+    const username = req.params.username;
+    let user = {
+      nama: req.body.nama,
+      email: req.body.email,
+      username: req.body.username
+    }
+    Users.update(user, {
+      where: {
+        username:username
+      }
+    })
+      .then(data => {
+       // res.flash('msg', 'Berhasil Melakukan Registrasi Silakan Lakukan login');
+        res.redirect('/login');
+      })
+      .catch(err => {
+        res.json({
+          info: "Error",
+          message: err.message
+        });
+      });
 
-// // // create Berita
-// router.post('/login', notauth,function (req, res, next) {
-//   username = req.session.username;
-  
-//   Users.findOne({
-//       where: {
-//         username: req.body.username
-//       }
-//     })
-//     .then(data => {
-//       if (data) {
-//         var loginValid = bcrypt.compareSync(req.body.password, data.password);
+  }
 
-//         if (loginValid) {
-//           // simpan session
-//           req.session.username = req.body.username;
-//           req.session.islogin = true;
-//           res.redirect('/dashboard');
-//         } else {
-//           let message = 'Username tidak boleh kosong'
-//     return res.render('login', {
-      
-//       title: 'Login User',
-//       username: username,
-//       message: message,
-//       msg: req.flash('msg')
-//       });
-//         }
-
-//       } else {
-//         res.redirect('/login');
-//       }
-//     })
-//     .catch(err => {
-//       res.redirect('/login');
-//     })
-
-
-// });
+});
 
 // Function Membuat Middleware Login
 // Function Membuat Middleware Jika Tidak Login

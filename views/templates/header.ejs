@@ -104,6 +104,13 @@
                 <% } else { %>
 
               <% } %> 
+              <% if (users.role=='admin' || users.role=='pembeli' || users.role=='penjual') { %> 
+                <li class="nav-item">
+                  <a class="nav-link" href="/profile">Profile</a>
+                </li>
+                <% } else { %>
+
+              <% } %> 
               
             </ul>
             <% if (users=='null') { %> 

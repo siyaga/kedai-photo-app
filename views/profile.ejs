@@ -1,0 +1,97 @@
+<%- include('templates/header')-%>
+      <h1 class="text-center"><%= title %></h1>
+      <br />
+    
+      <% let isiData; %>
+      <% if(locals.data) {isiData = data} %>
+      <div class="container-fluid h-custom">
+        <% if (typeof errors != 'undefined') { %>
+          <div class="alert alert-danger" role="alert">
+              <ul>
+                  <% errors.forEach(error => { %>
+                  <li><%= error.msg %></li>
+                  <% }) %>
+              </ul>
+          </div>
+          <% } %>
+        <br />
+        <div class="row d-flex justify-content-center align-items-center h-100">
+          <div class="col-md-9 col-lg-6 col-xl-5">
+            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
+              class="img-fluid" alt="Sample image">
+          </div>
+          <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+            
+            <form method="POST" action="/profile">
+                <input
+                type="hidden"
+                name="oldNama"
+                class="form-control form-control-lg"
+                value="<%= users.oldNama || users.nama %>"
+              />
+              <input
+                type="hidden"
+                name="oldEmail"
+                class="form-control form-control-lg"
+                value="<%= users.oldEmail || users.email %>"
+              />
+              <input
+                type="hidden"
+                name="oldEmail"
+                class="form-control form-control-lg"
+                value="<%= users.oldEmail || users.email %>"
+              />
+              <input
+                type="hidden"
+                name="oldUsername"
+                class="form-control form-control-lg"
+                value="<%= users.oldUsername || users.username %>"
+              />
+              <!-- Username input -->
+              <div class="form-outline mb-4">
+                <label for="nama" class="form-label">Nama</label>
+                <input
+                  type="text"
+                  name="nama"
+                  class="form-control form-control-lg"
+                  id="nama"
+                  value="<%= users.nama %>"
+                  placeholder="Nama"
+                />
+              </div>
+              <div class="form-outline mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input
+                type="email"
+                name="email"
+                class="form-control form-control-lg"
+                id="email"
+                value="<%= users.email %>"
+                placeholder="Email"
+                />
+              </div>
+              <div class="form-outline mb-3">
+                  <label for="username" class="form-label">Username</label>
+                  <input
+                    type="text"
+                    name="username"
+                    class="form-control form-control-lg"
+                    id="username"
+                    value="<%= users.username %>"
+                    placeholder="Username"
+                  />
+                </div>
+    
+              <div class="text-center text-lg-start mt-4 pt-2">
+                <button type="submit" class="btn btn-primary btn-lg"
+                  style="padding-left: 2.5rem; padding-right: 2.5rem;">Edit Profile</button>
+                <p class="small fw-bold mt-2 pt-1 mb-0"><a href="/"
+                    class="link-danger">Back to Home</a></p>
+              </div>
+    
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+    <%- include('templates/footer')-%>
