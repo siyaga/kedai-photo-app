@@ -173,7 +173,8 @@ router.post('/register', [
       email: req.body.email,
       username: req.body.username,
       password: passwordHash,
-      role: req.body.role
+      role: req.body.role,
+      image: "default.png"
     }
     Users.create(user)
       .then(data => {
@@ -192,15 +193,26 @@ router.post('/register', [
 });
 
 router.get('/profile',checkNotAuthenticated, function (req, res, next) {
+  console.log(req.user.username)
   res.render('profile', {
-    title: 'Edit Profile',
+    title: `Profile`,
     users: authUser(req.user)
   });
 });
 
 
-// create Berita
-router.post('/profile',checkNotAuthenticated, [
+router.get('/editprofile',checkNotAuthenticated, function (req, res, next) {
+   
+      res.render('editprofile', {
+        title: 'Edit Profile',
+        users: authUser(req.user)
+      });
+});
+
+
+// edit Berita
+router.post('/editprofile',checkNotAuthenticated, kirim.array('image', 1),
+ [
   check('nama')
   .notEmpty().withMessage('Nama harus diisi.'),
   body('email').custom(async (valueEmail,[
@@ -208,13 +220,14 @@ router.post('/profile',checkNotAuthenticated, [
   ] ) => {
 
     // Mencari nama yang sama di query
+    const beforeEmail = authUser(req.user.email);
 
     const Email = await Users.findOne({
       where: {
         email: valueEmail
       }
     });
-    if (valueEmail !== req.body.oldEmail && Email) {
+    if (valueEmail !== beforeEmail && Email) {
       throw new Error(`Email ${valueEmail} sudah terdaftar! `);
 
     }
@@ -223,43 +236,33 @@ router.post('/profile',checkNotAuthenticated, [
   })
   .notEmpty().withMessage('Email harus diisi.')
   .isEmail().withMessage('Email tidak valid.'),
-  body('username').custom(async (valueUsername, {req }) => {
-    // Mencari nama yang sama di query
-    const username = await Users.findOne({
-      where: {
-        username: valueUsername
-      }
-    });
-
-
-    if (valueUsername !== req.body.oldUsername && username) {
-      throw new Error(`Username ${valueUsername} sudah terdaftar! `);
-
-    }
-
-    return true;
-  })
-  .notEmpty().withMessage('Username harus diisi.')
-  .isLength({
-    max: 20
-  }).withMessage('Username maximal Harus 20 karakter.'),
-  
-
 ], function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    res.render('profile', {
+
+    
+    res.render('editprofile', {
       title: 'Edit Profile',
       errors: errors.array(),
-      data: req.body,
       users: authUser(req.user)
     });
   } else {
-    const username = req.params.username;
+    const username = req.users.username;
+    let image
+            if (!req.files.find((fileE) => fileE.filename)) {
+                image = 'default.png'
+            } else {
+
+                image = req.files[0].filename
+                fs.unlinkSync(`./public/image/${oldImage}`)
+            }
+            if (image == 'default.png') {
+                image = oldImage
+            }
     let user = {
       nama: req.body.nama,
       email: req.body.email,
-      username: req.body.username
+      image: image
     }
     Users.update(user, {
       where: {
@@ -268,7 +271,7 @@ router.post('/profile',checkNotAuthenticated, [
     })
       .then(data => {
        // res.flash('msg', 'Berhasil Melakukan Registrasi Silakan Lakukan login');
-        res.redirect('/login');
+        res.redirect('/');
       })
       .catch(err => {
         res.json({

@@ -17,7 +17,7 @@ function initialize(passport) {
             where: {username: username}
         })
         .then(result => {
-            
+            console.log(result);
             if (result) {
 
                 bcrypt.compare(password, result.password, (err, isMatch) => {
