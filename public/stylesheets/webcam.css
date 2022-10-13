@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+.placeholder-cam {
+  border-style: solid;
+  border-width: 1px;
+  border-color:#9da5aca7 ;
+  margin: auto;
+  margin-top: 5%;
+  margin-bottom: 3%;
+  width: 1200px;
+  height: 650px;
+  padding: 30px 35px 35px;
+  background: #fff;
+  border-radius: 7px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.menu {
+ border-radius: 7px;
+ position: relative;
+ top: 10%;
+ left: 1.5%;
+ width: 400px;
+ height: 480px;
+ border-style: solid;
+ border-width: 1px;
+ border-color: #9da5aca7;
+}
+
+.container-img {
+    overflow:hidden;
+    position: relative;
+    bottom: 72%;
+    left: 42%;
+    border-radius: 7px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #9da5aca7;
+    width: 640px;
+    height: 480px;
+    background: rgb(247, 246, 246);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+
+  .container-cam {
+    position: relative;
+    border-radius: 7px;
+    top: 7.5%;
+    left: 9.5%;
+    box-shadow: 0 20px 20px rgba(0,0,0,0.1);
+  }
+
+h2,h3 {
+    margin-top: 0;
+}
+
+form {
+    margin-top: 15px;
+}
+
+form>input {
+    margin-right: 15px;
+}
+
+.buttons {
+    width: 140px;
+    height: 50px;
+    border-radius: 7px;
+    background-color: #5372F0;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .buttons-disabled {
+    width: 140px;
+    height: 50px;
+    border-radius: 7px;
+    background-color: #dfdfdf;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    margin-right: 10%;
+  }
+
+  .buttons-active {
+    width: 140px;
+    height: 50px;
+    border-radius: 7px;
+    background-color: #27cb6e;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+    margin-right: 10%;
+  }
+
+.take-pic {
+  position: relative;
+  left: 12%;
+  top: 20%;
+}
+
+.container-button {
+    position: relative;
+    top: 20%;
+}
+
+.holder-img {
+    width: 640px;
+    height: 480px;
+}
+
+
+#results {
+    float: right;
+}
