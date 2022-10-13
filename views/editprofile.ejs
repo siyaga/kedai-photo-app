@@ -20,16 +20,16 @@
           </div>
           <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
             
-            <form method="POST" class="mt-4" action="editprofile/<%= detailUser.username %>" enctype="multipart/form-data">
+            <form method="POST" class="mt-4" action="/editprofile/<%= users.username %>" enctype="multipart/form-data">
                 <div class="col text-center">
-                    <img src="../images/<%= detailUser.image %>" alt="<%= detailUser.nama %>" class="img-thumbnail rounded-circle"
+                    <img src="../images/<%= users.image %>" alt="<%= users.nama %>" class="img-thumbnail rounded-circle"
                         width="200px">
                 </div>
 
                 <div class="mb-3">
                     <label for="image" class="form-label">Image </label>
             
-                    <input type="file" accept="image/png, image/jpeg, image/jpg" class="form-control" id="image" name="image" value="<%= detailUser.image %> ">
+                    <input type="file" accept="image/png, image/jpeg, image/jpg" class="form-control" id="image" name="image" value="<%= users.image %> ">
             
                 </div>
                
@@ -41,7 +41,7 @@
                   name="nama"
                   class="form-control form-control-lg"
                   id="nama"
-                  value="<%= detailUser.nama %>"
+                  value="<%= users.nama %>"
                   placeholder="Nama"
                 />
               </div>
@@ -52,7 +52,7 @@
                 name="email"
                 class="form-control form-control-lg"
                 id="email"
-                value="<%= detailUser.email %>"
+                value="<%= users.email %>"
                 placeholder="Email"
                 />
               </div>

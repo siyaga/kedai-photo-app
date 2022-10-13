@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var multer = require('multer');
+const fs = require('fs');
 var bcrypt = require('bcrypt');
 var moment = require('moment');
 var initializePassport = require('../auth');
@@ -31,6 +32,8 @@ const kirim = multer({
 const db = require('../models');
 const { authenticate } = require('passport');
 const { reset } = require('nodemon');
+const { users } = require('../models');
+const { info } = require('console');
 const Users = db.users;
 const Fotos = db.fotos;
 const Op = db.Sequelize.Op;
@@ -204,7 +207,8 @@ router.get('/profile',checkNotAuthenticated, function (req, res, next) {
 
 
 router.get('/editprofile/:username',checkNotAuthenticated, async function (req, res, next) {
-      await Users.findOne({where:{username:req.params.username}})
+      const id_user = req.user.id;
+      await Users.findByPk(id_user)
       .then(profile => {
         if(profile){
           res.render('editprofile', {
@@ -229,25 +233,7 @@ router.post('/editprofile/:username',checkNotAuthenticated, kirim.array('image',
  [
   check('nama')
   .notEmpty().withMessage('Nama harus diisi.'),
-  body('email').custom(async (valueEmail,[
-    req
-  ] ) => {
-
-    // Mencari nama yang sama di query
-    const beforeEmail = authUser(req.user.email);
-
-    const Email = await Users.findOne({
-      where: {
-        email: valueEmail
-      }
-    });
-    if (valueEmail !== beforeEmail && Email) {
-      throw new Error(`Email ${valueEmail} sudah terdaftar! `);
-
-    }
-
-    return true;
-  })
+  check('email')
   .notEmpty().withMessage('Email harus diisi.')
   .isEmail().withMessage('Email tidak valid.'),
 ],async function (req, res, next) {
@@ -261,14 +247,19 @@ router.post('/editprofile/:username',checkNotAuthenticated, kirim.array('image',
       users: authUser(req.user)
     });
   } else {
-    const id = req.users.id;
+    const oldImage = req.user.image;
+    const id = req.user.id;
     let image
             if (!req.files.find((fileE) => fileE.filename)) {
                 image = 'default.png'
             } else {
 
                 image = req.files[0].filename
-                fs.unlinkSync(`./public/image/${oldImage}`)
+                if(oldImage == 'default.png') {
+
+                } else {
+                  fs.unlinkSync(`././public/images/${oldImage}`)
+                }
             }
             if (image == 'default.png') {
                 image = oldImage
@@ -276,6 +267,8 @@ router.post('/editprofile/:username',checkNotAuthenticated, kirim.array('image',
     let user = {
       nama: req.body.nama,
       email: req.body.email,
+      username: req.user.username,
+      password: req.user.password,
       image: image
     }
     await Users.update(user, {
@@ -350,10 +343,10 @@ router.get("/tokofoto/:page", function (req, res, next) {
 */
 //end pagination
 
-router.get("/tambahfoto",checkNotAuthenticated, function (req, res, next) {
+router.get("/tambahfoto",checkNotAuthenticated,penjualRoleIs, function (req, res, next) {
   res.render("foto/tambahfoto", { title: "Tambah Foto", users: authUser(req.user) });
 });
-router.post("/tambahfoto",checkNotAuthenticated, kirim.array("gambar", 1), function (req, res, next) {
+router.post("/tambahfoto",checkNotAuthenticated,penjualRoleIs, kirim.array("gambar", 1), function (req, res, next) {
   var bilangan = req.body.harga;
   var reverse = bilangan.toString().split("").reverse().join(""),
     ribuan = reverse.match(/\d{1,3}/g);
@@ -379,7 +372,7 @@ router.post("/tambahfoto",checkNotAuthenticated, kirim.array("gambar", 1), funct
     });
 });
 
-router.get("/deletefoto/:id",checkNotAuthenticated, function (req, res, next) {
+router.get("/deletefoto/:id",checkNotAuthenticated,penjualRoleIs, function (req, res, next) {
   var id = parseInt(req.params.id); // /detail/2, /detail/3
   Fotos.destroy({
     where: { id: id },
@@ -424,7 +417,7 @@ router.get("/viewfoto/:id", function (req, res, next) {
     });
 });
 
-router.get("/editfoto/:id",checkNotAuthenticated, function (req, res, next) {
+router.get("/editfoto/:id",checkNotAuthenticated,penjualRoleIs, function (req, res, next) {
   const id = parseInt(req.params.id);
   Fotos.findByPk(id)
     .then((foto) => {
@@ -442,7 +435,7 @@ router.get("/editfoto/:id",checkNotAuthenticated, function (req, res, next) {
       res.redirect("/editfoto");
     });
 });
-router.post("/editfoto/:id",checkNotAuthenticated, kirim.array("gambar", 1), function (req, res, next) {
+router.post("/editfoto/:id",checkNotAuthenticated,penjualRoleIs, kirim.array("gambar", 1), function (req, res, next) {
   const id = parseInt(req.params.id);
   var bilangan = req.body.harga;
   var reverse = bilangan.toString().split("").reverse().join(""),
