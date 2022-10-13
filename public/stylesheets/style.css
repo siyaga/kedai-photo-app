@@ -1,6 +1,10 @@
 body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font-family: Trebuchet MS;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
 }
 
 a {
@@ -93,3 +97,4 @@ height: calc(100% - 73px);
 height: 100%;
 }
 }
+

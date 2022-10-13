@@ -30,7 +30,9 @@ const kirim = multer({
 
 const db = require('../models');
 const { authenticate } = require('passport');
+const { reset } = require('nodemon');
 const Users = db.users;
+const Fotos = db.fotos;
 const Op = db.Sequelize.Op;
 
 
@@ -59,10 +61,6 @@ function authUser(req) {
   }
 }
 
-/* GET home page. */
-router.get('/',checkNotAuthenticated, function(req, res, next) {
-  res.render('index', { title: 'Example', users: authUser(req.user) });
-});
 
 /* GET Pembeli page. */
 router.get('/pembeli',checkNotAuthenticated, pembeliRoleIs, function(req, res, next) {
@@ -77,6 +75,11 @@ router.get('/penjual',checkNotAuthenticated, penjualRoleIs, function(req, res, n
 /* GET Admin page. */
 router.get('/admin',checkNotAuthenticated, adminRoleIs, function(req, res, next) {
   res.render('admin', { title: 'Admin', users: authUser(req.user) });
+});
+
+/* GET 404 page. */
+router.get('/404', function(req, res, next) {
+  res.render('404', { title: '404', users: authUser(req.user) });
 });
 
 router.get('/register', function (req, res, next) {
@@ -193,7 +196,6 @@ router.post('/register', [
 });
 
 router.get('/profile',checkNotAuthenticated, function (req, res, next) {
-  console.log(req.user.username)
   res.render('profile', {
     title: `Profile`,
     users: authUser(req.user)
@@ -201,17 +203,29 @@ router.get('/profile',checkNotAuthenticated, function (req, res, next) {
 });
 
 
-router.get('/editprofile',checkNotAuthenticated, function (req, res, next) {
-   
-      res.render('editprofile', {
-        title: 'Edit Profile',
-        users: authUser(req.user)
-      });
+router.get('/editprofile/:username',checkNotAuthenticated, async function (req, res, next) {
+      await Users.findOne({where:{username:req.params.username}})
+      .then(profile => {
+        if(profile){
+          res.render('editprofile', {
+            title: `Edit Profile ${req.params.username}`,
+            detailUser: profile,
+            users: authUser(req.user)
+          });
+        } else {
+          res.redirect('404');
+        }
+        
+      })
+      .catch(err => {
+        throw err;
+      })
+     
 });
 
 
 // edit Berita
-router.post('/editprofile',checkNotAuthenticated, kirim.array('image', 1),
+router.post('/editprofile/:username',checkNotAuthenticated, kirim.array('image', 1),
  [
   check('nama')
   .notEmpty().withMessage('Nama harus diisi.'),
@@ -236,7 +250,7 @@ router.post('/editprofile',checkNotAuthenticated, kirim.array('image', 1),
   })
   .notEmpty().withMessage('Email harus diisi.')
   .isEmail().withMessage('Email tidak valid.'),
-], function (req, res, next) {
+],async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
 
@@ -247,7 +261,7 @@ router.post('/editprofile',checkNotAuthenticated, kirim.array('image', 1),
       users: authUser(req.user)
     });
   } else {
-    const username = req.users.username;
+    const id = req.users.id;
     let image
             if (!req.files.find((fileE) => fileE.filename)) {
                 image = 'default.png'
@@ -264,9 +278,9 @@ router.post('/editprofile',checkNotAuthenticated, kirim.array('image', 1),
       email: req.body.email,
       image: image
     }
-    Users.update(user, {
+    await Users.update(user, {
       where: {
-        username:username
+        id:id
       }
     })
       .then(data => {
@@ -283,6 +297,180 @@ router.post('/editprofile',checkNotAuthenticated, kirim.array('image', 1),
   }
 
 });
+
+// penjual 
+
+router.get("/pengeditfoto",checkNotAuthenticated, function (req, res, next) {
+  res.render("foto/pengeditfoto", { title: "Pengedit Foto", 
+  users: authUser(req.user) });
+});
+
+//disini
+
+router.get("/",async function (req, res, next) {
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(20);
+  await Fotos.findAll()
+
+    .then((foto) => {
+      res.render("foto/tokofoto", {
+        title: "Toko Foto",
+        fotos: foto,
+        users: authUser(req.user)
+      });
+    })
+    .catch((err) => {
+      res.render("tokofoto", {
+        title: "Toko Foto",
+        fotos: [],
+        users: authUser(req.user)
+      });
+    });
+});
+
+// pagination
+/*
+router.get("/tokofoto/:page", function (req, res, next) {
+  var perPage = 9;
+  var page = req.params.page || 1;
+
+  Fotos.find({})
+    .skip(perPage * page - perPage)
+    .limit(perPage)
+    .exec(function (err, fotos) {
+      Fotos.count().exec(function (err, count) {
+        if (err) return next(err);
+        res.render("tokofoto", {
+          fotos: fotos,
+          current: page,
+          pages: Math.ceil(count / perPage),
+        });
+      });
+    });
+});
+*/
+//end pagination
+
+router.get("/tambahfoto",checkNotAuthenticated, function (req, res, next) {
+  res.render("foto/tambahfoto", { title: "Tambah Foto", users: authUser(req.user) });
+});
+router.post("/tambahfoto",checkNotAuthenticated, kirim.array("gambar", 1), function (req, res, next) {
+  var bilangan = req.body.harga;
+  var reverse = bilangan.toString().split("").reverse().join(""),
+    ribuan = reverse.match(/\d{1,3}/g);
+  ribuan = ribuan.join(".").split("").reverse().join("");
+
+  let gambar = req.files[0].filename;
+  let foto = {
+    iduser: req.user.id,
+    judul: req.body.judul,
+    deskripsi: req.body.deskripsi,
+    harga: ribuan,
+    gambar: gambar,
+  };
+  Fotos.create(foto)
+    .then((data) => {
+      res.redirect("/");
+    })
+    .catch((err) => {
+      res.render("foto/tambahfoto", {
+        title: "Tambah Foto",
+        users: authUser(req.user)
+      });
+    });
+});
+
+router.get("/deletefoto/:id",checkNotAuthenticated, function (req, res, next) {
+  var id = parseInt(req.params.id); // /detail/2, /detail/3
+  Fotos.destroy({
+    where: { id: id },
+  })
+    .then((num) => {
+      res.redirect("/");
+      
+    })
+    .catch((err) => {
+      res.json({
+        info: "Error",
+        message: err.message,
+      });
+    });
+});
+
+// view
+router.get("/viewfoto/:id", function (req, res, next) {
+  var id = req.params.id;
+  // var nama = req.params.nama;
+  // const komentarr = await Comment1s.findAll({ where: { idfoto: id } });
+  Fotos.findByPk(id)
+    .then((foto) => {
+      if (foto) {
+        res.render("foto/viewfoto", {
+          title: "View Foto",
+          fotos: foto,
+          users: authUser(req.user)
+          // comment1s: komentarr,
+        });
+      } else {
+        // http 404 not found
+      res.redirect("/404");
+      }
+    })
+    .catch((err) => {
+      res.render("foto/viewfoto", {
+        title: "View Foto",
+        berita: {},
+        users: authUser(req.user)
+      });
+    });
+});
+
+router.get("/editfoto/:id",checkNotAuthenticated, function (req, res, next) {
+  const id = parseInt(req.params.id);
+  Fotos.findByPk(id)
+    .then((foto) => {
+      if (foto) {
+        res.render("foto/editfoto", {
+          title: "Edit Foto",
+          fotos: foto,
+          users: authUser(req.user)
+        });
+      } else {
+        res.redirect("/");
+      }
+    })
+    .catch((err) => {
+      res.redirect("/editfoto");
+    });
+});
+router.post("/editfoto/:id",checkNotAuthenticated, kirim.array("gambar", 1), function (req, res, next) {
+  const id = parseInt(req.params.id);
+  var bilangan = req.body.harga;
+  var reverse = bilangan.toString().split("").reverse().join(""),
+    ribuan = reverse.match(/\d{1,3}/g);
+  ribuan = ribuan.join(".").split("").reverse().join("");
+
+  let gambar = req.files[0].filename;
+  let foto = {
+    iduser : req.user.id,
+    judul: req.body.judul,
+    deskripsi: req.body.deskripsi,
+    harga: ribuan,
+    gambar: gambar,
+  };
+  Fotos.update(foto, {
+    where: { id: id },
+  })
+    .then((num) => {
+      res.redirect("/");
+    })
+    .catch((err) => {
+      res.json({
+        info: "Error",
+        message: err.message,
+      });
+    });
+});
+
 
 // Function Membuat Middleware Login
 // Function Membuat Middleware Jika Tidak Login
