@@ -1,0 +1,59 @@
+<%- include('../templates/header')-%>
+
+  <link rel="stylesheet" href="../stylesheets/webcam.css">
+  <div class="placeholder-cam disable">
+    <div class="menu">
+      <div class="container-cam" id="my_camera"></div>
+      <div class="container-button" id="download">
+        <button onClick="take_snapshot()" class=" buttons take-pic">Ambil Gambar</button>
+        &nbsp;
+        &nbsp;
+        <button class=" buttons-disabled take-pic" disabled>Unduh</button>
+      </div>
+    </div>
+    <div class="container-img">
+      <div id="results">
+        <img src="../images/placeholder.jpg" alt="preview-img">
+      </div>
+    </div>
+  </div>
+
+
+  <script type="text/javascript" src="../javascripts/webcam.min.js"></script>
+  <!-- Configure a few settings and attach camera -->
+  <script language="JavaScript">
+    Webcam.set({
+      width: 320,
+      height: 240,
+      dest_width: 640,
+      dest_height: 480,
+      image_format: 'jpeg',
+      jpeg_quality: 90,
+      flip_horiz: true
+    });
+    Webcam.attach('#my_camera');
+  </script>
+  <!-- First, include the Webcam.js JavaScript Library -->
+
+
+  <!-- Code to handle taking the snapshot and displaying it locally -->
+  <script language="JavaScript">
+    function take_snapshot() {
+      // take snapshot and get image data
+      Webcam.snap(function (data_uri) {
+        var data = data_uri;
+        // display results in page
+        document.getElementById('results').innerHTML =
+          '<a href="' + data_uri + '" download> <img src="' + data_uri + '"/></a>';
+        document.getElementById('download').innerHTML =
+          '<button onClick="take_snapshot()" class=" buttons take-pic">Ambil Gambar</button>' +
+          '&nbsp;' +
+          '&nbsp;' +
+          '&nbsp;' +
+          '&nbsp;' +
+          '<a href="' + data_uri + '" download> <button class=" buttons-active take-pic">Unduh</button></a>';
+      });
+    }
+  </script>
+
+  <%- include('../templates/footer')-%>

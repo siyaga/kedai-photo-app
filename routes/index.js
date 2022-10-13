@@ -267,8 +267,6 @@ router.post('/editprofile/:username',checkNotAuthenticated, kirim.array('image',
     let user = {
       nama: req.body.nama,
       email: req.body.email,
-      username: req.user.username,
-      password: req.user.password,
       image: image
     }
     await Users.update(user, {
@@ -387,6 +385,17 @@ router.get("/deletefoto/:id",checkNotAuthenticated,penjualRoleIs, function (req,
         message: err.message,
       });
     });
+});
+
+// view
+router.get("/webcam/",checkNotAuthenticated, function (req, res, next) {
+
+        res.render("foto/webcam", {
+          title: "Foto Menggunakan WebCam",
+          users: authUser(req.user)
+        });
+      
+  
 });
 
 // view
