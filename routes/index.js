@@ -34,6 +34,7 @@ const { authenticate } = require('passport');
 const { reset } = require('nodemon');
 const { users } = require('../models');
 const { info } = require('console');
+const user = require('../models/user');
 const Users = db.users;
 const Transaksis = db.transaksis;
 const Fotos = db.fotos;
@@ -182,9 +183,14 @@ router.post('/register',checkAuthenticated, [
 
 });
 
-router.get('/profile',checkNotAuthenticated, function (req, res, next) {
+router.get('/profile',checkNotAuthenticated, async function (req, res, next) {
+  const statusTransaksi = await Transaksis.findAll({where : { idpenjual : req.user.id, status : "Sudah Bayar" }});
+  const Pengeluaran = await Transaksis.findAll({where : { idpenjual : req.user.id, status : "Sudah Bayar" }, attributes:  ['harga'] });
+
   res.render('profile', {
     title: `Profile`,
+    pengeluaran: Pengeluaran,
+    transaksi: statusTransaksi,
     users: authUser(req.user)
   });
 });
