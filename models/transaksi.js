@@ -16,7 +16,7 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.STRING
 		},
 		harga: {
-			type: Sequelize.STRING
+			type: Sequelize.FLOAT
 		},
         status: {
 			type: Sequelize.STRING
