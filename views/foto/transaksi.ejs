@@ -24,7 +24,7 @@
                                 <td>Rp. <%=item.harga %></td>
                                 <td><%=item.status %></td>
                                 <td>
-                                    <% if (users.role=='pembeli') { %>
+                                    <% if (users.role=='pembeli' && item.status == "Belum Bayar") { %>
                                         <button type="button" class="btn btn-outline-success">BAYAR</button>
                                         <a href="/deletetransaksi/<%=item.id %>"  type="button" class="btn btn-outline-danger" onclick="return confirm('yakin Anda Menghapus Transaksi <%= item.judul %>?')">HAPUS</a>
                                     <% }else { %>

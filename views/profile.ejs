@@ -10,12 +10,16 @@
                   class="rounded-circle img-fluid" style="width: 100px;" />
               </div>
               <h4 class="mb-2"><%= users.username %> </h4>
+              <h7 class="mb-2"><%= users.role %> </h7>
               <p class="text-muted mb-4"><%= users.nama %>  <span class="mx-2">|</span> <%= users.email %> </p>
             
               <a href="/editprofile/<%= users.username %>" type="button" class="btn btn-primary btn-rounded btn-lg">
-                Edit Profile
+                Edit Profile 
               </a>
               <div class="d-flex justify-content-between text-center mt-5 mb-2">
+                <% if (users.role=="penjual" || users.role=="pembeli" ) { %>
+                 
+              
                 <div>
                   <p class="mb-2 h5">8471</p>
                   <p class="text-muted mb-0">Wallets Balance</p>
@@ -25,9 +29,17 @@
                   <p class="text-muted mb-0">Income amounts</p>
                 </div>
                 <div>
-                  <p class="mb-2 h5"><%= transaksi.length %> </p>
+                  <p class="mb-2 h5">
+                    <% if (users.role=="penjual") { %>
+                    <%= transaksi.length %> 
+                    <% } %>
+                    <% if (users.role=="pembeli") { %>
+                    <%= pengeluaran.length %> 
+                      <% } %>
+                  </p>
                   <p class="text-muted mb-0">Total Transactions</p>
                 </div>
+                <% } %>
               </div>
             </div>
           </div>

@@ -185,7 +185,9 @@ router.post('/register',checkAuthenticated, [
 
 router.get('/profile',checkNotAuthenticated, async function (req, res, next) {
   const statusTransaksi = await Transaksis.findAll({where : { idpenjual : req.user.id, status : "Sudah Bayar" }});
-  const Pengeluaran = await Transaksis.findAll({where : { idpenjual : req.user.id, status : "Sudah Bayar" }, attributes:  ['harga'] });
+  const Pengeluaran = await Transaksis.findAll({where : { idpembeli : req.user.id, status : "Sudah Bayar" }, attributes:  ['harga'] });
+  const converProfit = [];
+  pengeluaran.foreach()
 
   res.render('profile', {
     title: `Profile`,
