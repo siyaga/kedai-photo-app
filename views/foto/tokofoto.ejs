@@ -8,7 +8,7 @@
             <div class="p-3 mb-2 bg-warning text-dark">Data Foto Tidak ada</div>
             <% } else {%>   
           <%fotos.forEach(function(item) {%>
-            <% if(users=='null' || users.role=='pembeli') {%>
+            <% if(users=='null' || users.role=='pembeli' || users.role=='admin') {%>
               <div class="col">
                 <div class="card shadow-sm">
                   <img src="../images/<%=item.gambar%>" width="100%" height="225" />
@@ -20,9 +20,12 @@
                         <a href="/viewfoto/<%=item.id %>" type="button" class="btn btn-sm btn-outline-warning">View</a>&nbsp;&nbsp;
                         <% if(users.role=='null' || users.role=='pembeli') {%>
                           <% } %>  
-                        <% if(users.role=='admin' || users.role=='penjual') { %>   
-                        <a href="/editfoto/<%=item.id %>" type="button" class="btn btn-sm btn-outline-warning">Edit</a>
-                        <a href="/deletefoto/<%=item.id %>" type="button" class="btn btn-sm btn-outline-danger">Hapus</a>
+                          <% if( users.role=='penjual') { %>   
+                            <a href="/editfoto/<%=item.id %>" type="button" class="btn btn-sm btn-outline-warning">Edit</a>
+                            <a href="/deletefoto/<%=item.id %>" type="button" class="btn btn-sm btn-outline-danger"  onclick="return confirm('yakin Anda Menghapus Foto  <%= item.judul %>?')">Hapus</a>
+                            <% } %> 
+                        <% if(users.role=='admin') { %>   
+                        <a href="/deletefoto/<%=item.id %>" type="button" class="btn btn-sm btn-outline-danger"  onclick="return confirm('yakin Anda Menghapus Foto  <%= item.judul %>?')">Hapus</a>
                         <% } %> 
                       </div>
                       <% if (users.role=='pembeli') { %>
@@ -42,7 +45,7 @@
                               Rp.<%=item.harga%></button></small>
                         </form>
                       <% } %>
-                      <% if (users=="null") { %>
+                      <% if (users=="null" || users.role=="admin") { %>
                         <small class="text-muted">
                           <a href="/login" type="button" class="btn btn-primary">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-plus" viewBox="0 0 16 16">
