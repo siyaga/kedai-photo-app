@@ -19,9 +19,12 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 db.fotos = require("./foto")(sequelize, Sequelize);
+db.transaksis = require('./transaksi')(sequelize, Sequelize);
 db.users = require('./user')(sequelize, Sequelize);
 
 db.fotos.hasMany(db.fotos, {foreignKey:'iduser'});
 db.users.belongsTo(db.users,{foreignKey:'id'});
+
+
 
 module.exports = db;

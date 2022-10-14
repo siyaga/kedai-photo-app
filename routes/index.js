@@ -35,6 +35,7 @@ const { reset } = require('nodemon');
 const { users } = require('../models');
 const { info } = require('console');
 const Users = db.users;
+const Transaksis = db.transaksis;
 const Fotos = db.fotos;
 const Op = db.Sequelize.Op;
 
@@ -167,7 +168,6 @@ router.post('/register', [
     res.render('register', {
       title: 'Register User',
       errors: errors.array(),
-      username: username,
       data: req.body,
       users: authUser(req.user)
     });
@@ -385,6 +385,58 @@ router.get("/deletefoto/:id",checkNotAuthenticated,penjualRoleIs, function (req,
         message: err.message,
       });
     });
+});
+
+router.get('/transaksi',checkNotAuthenticated, function(req, res, next) {
+	Transaksis.findAll()
+	  	.then(transaksi => {
+			res.render('foto/transaksi', { 
+			title: 'Data Transaksi',
+			transaksis: transaksi,
+      users: authUser(req.user)
+	  		});
+	  	})
+	  	.catch(err => {		
+	  		res.render('tokofoto', { 
+			title: 'Toko Foto',
+			transaksis: []
+	  		});
+	  	});
+});
+router.post('/transaksi',checkNotAuthenticated, function(req, res, next) {
+		let transaksi = {
+      idpenjual: req.body.idpenjual,
+		  idpesanan: req.body.id,
+		  gambar: req.body.gambar,
+		  judul: req.body.judul,
+		  harga: req.body.harga,
+		  status: req.body.status
+	  }
+	  Transaksis.create(transaksi)
+	  .then(data => {
+		  res.redirect('/transaksi');
+	  })
+	  .catch(err => {
+		  res.render('tokofoto', { 
+		title: 'Tambah Foto'
+		  });
+	  });
+});
+
+router.get('/deletetransaksi/:id',checkNotAuthenticated, function(req, res, next) {  
+	var id = parseInt(req.params.id); // /detail/2, /detail/3
+	Transaksis.destroy({
+		where: {id: id}
+	})
+	.then(num => {
+		res.redirect('/transaksi');
+	})
+	.catch(err => {
+		res.json({
+			info: "Error",
+			message: err.message
+		});
+	 });  
 });
 
 // view
