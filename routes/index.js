@@ -65,28 +65,12 @@ function authUser(req) {
   }
 }
 
-
-/* GET Pembeli page. */
-router.get('/pembeli',checkNotAuthenticated, pembeliRoleIs, function(req, res, next) {
-  res.render('pembeli', { title: 'Pembeli', users: authUser(req.user) });
-});
-
-/* GET Penjual page. */
-router.get('/penjual',checkNotAuthenticated, penjualRoleIs, function(req, res, next) {
-  res.render('penjual', { title: 'Penjual', users: authUser(req.user) });
-});
-
-/* GET Admin page. */
-router.get('/admin',checkNotAuthenticated, adminRoleIs, function(req, res, next) {
-  res.render('admin', { title: 'Admin', users: authUser(req.user) });
-});
-
 /* GET 404 page. */
 router.get('/404', function(req, res, next) {
   res.render('404', { title: '404', users: authUser(req.user) });
 });
 
-router.get('/register', function (req, res, next) {
+router.get('/register',checkAuthenticated, function (req, res, next) {
   res.render('register', {
     title: 'Register User',
     users: authUser(req.user)
@@ -95,7 +79,7 @@ router.get('/register', function (req, res, next) {
 
 
 // create Berita
-router.post('/register', [
+router.post('/register',checkAuthenticated, [
   check('nama')
   .notEmpty().withMessage('Nama harus diisi.'),
   body('email').custom(async (valueEmail, ) => {
@@ -441,7 +425,7 @@ router.get('/deletetransaksi/:id',checkNotAuthenticated, function(req, res, next
 });
 
 // view
-router.get("/webcam/",checkNotAuthenticated, function (req, res, next) {
+router.get("/webcam/", function (req, res, next) {
 
         res.render("foto/webcam", {
           title: "Foto Menggunakan WebCam",
