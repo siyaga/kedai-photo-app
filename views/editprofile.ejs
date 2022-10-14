@@ -22,7 +22,7 @@
             
             <form method="POST" class="mt-4" action="/editprofile/<%= users.username %>" enctype="multipart/form-data">
                 <div class="col text-center">
-                    <img src="../images/<%= users.image %>" alt="<%= users.nama %>" class="img-thumbnail rounded-circle"
+                    <img src="../images/<%= users.image %>" alt="<%= users.name %>" class="img-thumbnail rounded-circle"
                         width="200px">
                 </div>
 
@@ -35,12 +35,12 @@
                
               <!-- Username input -->
               <div class="form-outline mb-4">
-                <label for="nama" class="form-label">Nama</label>
+                <label for="name" class="form-label">Nama</label>
                 <input
                   type="text"
-                  name="nama"
+                  name="name"
                   class="form-control form-control-lg"
-                  id="nama"
+                  id="name"
                   value="<%= users.nama %>"
                   placeholder="Nama"
                 />

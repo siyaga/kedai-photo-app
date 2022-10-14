@@ -81,7 +81,7 @@ router.get('/register',checkAuthenticated, function (req, res, next) {
 
 // create Berita
 router.post('/register',checkAuthenticated, [
-  check('nama')
+  check('name')
   .notEmpty().withMessage('Nama harus diisi.'),
   body('email').custom(async (valueEmail, ) => {
 
@@ -160,12 +160,13 @@ router.post('/register',checkAuthenticated, [
 
     let passwordHash = bcrypt.hashSync(req.body.password, 10);
     let user = {
-      nama: req.body.nama,
+      name: req.body.name,
       email: req.body.email,
       username: req.body.username,
       password: passwordHash,
       role: req.body.role,
-      image: "default.png"
+      image: "default.png",
+      balance: 0,
     }
     Users.create(user)
       .then(data => {
@@ -233,7 +234,7 @@ router.get('/editprofile/:username',checkNotAuthenticated, async function (req, 
 // edit Berita
 router.post('/editprofile/:username',checkNotAuthenticated, kirim.array('image', 1),
  [
-  check('nama')
+  check('name')
   .notEmpty().withMessage('Nama harus diisi.'),
   check('email')
   .notEmpty().withMessage('Email harus diisi.')
@@ -358,7 +359,7 @@ router.post("/tambahfoto",checkNotAuthenticated,penjualRoleIs, kirim.array("gamb
   // ribuan = ribuan.join(".").split("").reverse().join("");
 
   let gambar = req.files[0].filename;
-  let Harga = parseInt(req.body.harga);
+  let Harga = req.body.harga;
 
   let foto = {
     iduser: req.user.id,
@@ -462,7 +463,24 @@ router.get('/bayar/:id',checkNotAuthenticated, async function(req, res, next) {
   let transaksi = {
     status: "Sudah Bayar"
   }
+  // validasi wallet
   const CariFoto = await Transaksis.findByPk(id);
+  let pembeliBalance = req.user.balance;
+  let hasilPembayaran = pembeliBalance - CariFoto.harga;
+  if(hasilPembayaran < 0){
+
+    res.send({message : "Biaya Kurang Mohon Untuk Top Up terlebih dahulu"}); 
+  } else {
+  // take Profit Penjual
+  const CariPenjual = await Users.findByPk(CariFoto.idpenjual)  
+  let profitPenjual = CariPenjual.balance + CariFoto.harga;
+  console.log(CariFoto.idpenjual);
+  
+  // pembeli
+  await Users.update({balance: hasilPembayaran}, {where: {id:CariFoto.idpembeli}});
+  // penjual
+  await Users.update({balance: profitPenjual}, {where: {id:CariFoto.idpenjual}});
+  
   await Fotos.update(transaksi,{where:{id:CariFoto.idpesanan}});
   await Transaksis.update(transaksi, {where : {id: id}})
   .then( data => {
@@ -473,6 +491,7 @@ router.get('/bayar/:id',checkNotAuthenticated, async function(req, res, next) {
   title: 'Tambah Foto'
     });
   });
+}
 });
 
 
