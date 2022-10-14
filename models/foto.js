@@ -13,7 +13,7 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.TEXT,
     },
     harga: {
-      type: Sequelize.STRING,
+      type: Sequelize.FLOAT,
     }
   }, {
         
