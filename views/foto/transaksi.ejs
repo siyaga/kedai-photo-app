@@ -25,11 +25,16 @@
                                 <th scope="row"><%=item.id %></th>
                                 <td><img src="../images/<%=item.gambar %>" width="70" height="100%" alt="<%=item.judul %>"/></td>
                                 <td><%=item.judul %></td>
-                                <td>Rp. <%=ribuan %></td>
-                                <td><%=item.status %></td>
+                                <td>Rp.<%=ribuan %></td>
+                                <% if (item.status =="Belum Bayar") { %>
+                                    <td><p class="bg-warning text-dark"><%=item.status %></p></td>
+                                    <% } %>
+                                    <% if (item.status =="Sudah Bayar") { %>
+                                        <td ><p class="bg-success text-white"><%=item.status %></p></td>
+                                        <% } %>
                                 <td>
                                     <% if (users.role=='pembeli' && item.status == "Belum Bayar") { %>
-                                        <button type="button" class="btn btn-outline-success">BAYAR</button>
+                                        <a href="/bayar/<%=item.id %>" type="button" class="btn btn-outline-success">BAYAR</a>
                                         <a href="/deletetransaksi/<%=item.id %>"  type="button" class="btn btn-outline-danger" onclick="return confirm('yakin Anda Menghapus Transaksi <%= item.judul %>?')">HAPUS</a>
                                     <% }else { %>
                                         
@@ -42,11 +47,18 @@
                                     <th scope="row"><%=item.id %></th>
                                     <td><img src="../images/<%=item.gambar %>" width="70" height="100%" alt="<%=item.judul %>"/></td>
                                     <td><%=item.judul %></td>
-                                    <td>Rp. <%=ribuan %></td>
-                                    <td><%=item.status %></td>
+                                    <td>Rp.<%=ribuan %></td>
+                                    <% if (item.status =="Belum Bayar") { %>
+                                        <td><p class="bg-warning text-dark"><%=item.status %></p></td>
+                                    <% } %>
+                                    <% if (item.status =="Sudah Bayar") { %>
+                                        <td ><p class="bg-success text-white"><%=item.status %></p></td>
+                                        <% } %>
                                     <td>
                                         <% if (users.role=='pembeli') { %>
+                                            <form method="POST" action="/bayar/<%= item.id %>" >
                                             <button type="button" class="btn btn-outline-success">BAYAR</button>
+                                        </form>
                                             <a href="/deletetransaksi/<%=item.id %>"  type="button" class="btn btn-outline-danger">HAPUS</a>
                                         <% }else { %>
                                             

@@ -25,16 +25,39 @@
                   <p class="text-muted mb-0">Wallets Balance</p>
                 </div>
                 <div class="px-3">
-                  <p class="mb-2 h5">8512</p>
-                  <p class="text-muted mb-0">Income amounts</p>
+                  
+                    
+                    <% if (users.role=="penjual") { %>
+                      <p class="mb-2 h5">
+                      <%  
+                      var reverse = (profitPenjual).toString().split("").reverse().join(""),
+                        ribuan = reverse.match(/\d{1,3}/g);
+                      ribuan = ribuan.join(".").split("").reverse().join(""); %> 
+                      Rp.<%= ribuan %> 
+                      
+                    </p>
+                    <p class="text-muted mb-0">Profit</p>
+                      <% } %>
+                      <% if (users.role=="pembeli") { %>
+                        <p class="mb-2 h5">
+                        <%  
+                        var reverse = (pengeluaran).toString().split("").reverse().join(""),
+                          ribuan = reverse.match(/\d{1,3}/g);
+                        ribuan = ribuan.join(".").split("").reverse().join(""); %> 
+                      Rp.<%= ribuan %> 
+                    </p>
+                    <p class="text-muted mb-0">Pengeluaran</p>
+                        <% } %>
+                  
+                  
                 </div>
                 <div>
                   <p class="mb-2 h5">
                     <% if (users.role=="penjual") { %>
-                    <%= transaksi.length %> 
+                    <%= transaksipenjualan.length %> 
                     <% } %>
                     <% if (users.role=="pembeli") { %>
-                    <%= pengeluaran.length %> 
+                    <%= transaksipengeluaran.length %> 
                       <% } %>
                   </p>
                   <p class="text-muted mb-0">Total Transactions</p>

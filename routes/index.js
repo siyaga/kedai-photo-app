@@ -186,17 +186,23 @@ router.post('/register',checkAuthenticated, [
 router.get('/profile',checkNotAuthenticated, async function (req, res, next) {
   const statusTransaksi = await Transaksis.findAll({where : { idpenjual : req.user.id, status : "Sudah Bayar" }});
   const Pengeluaran = await Transaksis.findAll({where : { idpembeli : req.user.id, status : "Sudah Bayar" }});
-  // console.log(statusTransaksi);
-  // let converProfit = [];
-  // await statusTransaksi.forEach(pengluaran=> {
-  //   converProfit.push(parseInt(pengluaran.harga));
-  // })
-  // console.log(converProfit);
+  // hitung profit
+  let profitPenjual = 0;
+   statusTransaksi.forEach(pengluaran=> {
+    profitPenjual += pengluaran.harga
+  });
+  // hitung Pengeluaran
+  let pengeluaran = 0;
+    Pengeluaran.forEach(pengluaran=> {
+      pengeluaran += pengluaran.harga
+  });
 
   res.render('profile', {
     title: `Profile`,
-    pengeluaran: Pengeluaran,
-    transaksi: statusTransaksi,
+    transaksipengeluaran: Pengeluaran,
+    profitPenjual : profitPenjual,
+    pengeluaran : pengeluaran,
+    transaksipenjualan: statusTransaksi,
     users: authUser(req.user)
   });
 });
@@ -296,9 +302,12 @@ router.get("/pengeditfoto",checkNotAuthenticated, function (req, res, next) {
 
 router.get("/",async function (req, res, next) {
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(20);
+  
+  // let cekstatus =  await Transaksis.findAll({where:{idpesanan: foto.id}});
+  // console.log(cekstatus);
   await Fotos.findAll()
 
-    .then((foto) => {
+    .then(async (foto) => {
       res.render("foto/tokofoto", {
         title: "Toko Foto",
         fotos: foto,
@@ -309,6 +318,7 @@ router.get("/",async function (req, res, next) {
       res.render("tokofoto", {
         title: "Toko Foto",
         fotos: [],
+        cekstatus: [],
         users: authUser(req.user)
       });
     });
@@ -343,12 +353,12 @@ router.get("/tambahfoto",checkNotAuthenticated,penjualRoleIs, function (req, res
 
 router.post("/tambahfoto",checkNotAuthenticated,penjualRoleIs, kirim.array("gambar", 1), function (req, res, next) {
   // var bilangan = req.body.harga;
-  // var reverse = bilangan.toString().split("").reverse().join(""),
-  //   ribuan = reverse.match(/\d{1,3}/g);
+  // var reverse = bilangan.toString().split("").reverse().join("");
+  // ribuan = reverse.match(/\d{1,3}/g);
   // ribuan = ribuan.join(".").split("").reverse().join("");
 
   let gambar = req.files[0].filename;
-  let Harga = parseInt(req.body.harga)
+  let Harga = parseInt(req.body.harga);
 
   let foto = {
     iduser: req.user.id,
@@ -356,6 +366,7 @@ router.post("/tambahfoto",checkNotAuthenticated,penjualRoleIs, kirim.array("gamb
     deskripsi: req.body.deskripsi,
     harga: Harga,
     gambar: gambar,
+    status: "Belum Bayar",
   };
   console.log(foto);
   Fotos.create(foto)
@@ -403,6 +414,8 @@ router.get('/transaksi',checkNotAuthenticated, function(req, res, next) {
 	  		});
 	  	});
 });
+
+
 router.post('/transaksi',checkNotAuthenticated, function(req, res, next) {
 		let transaksi = {
       idpenjual: req.body.idpenjual,
@@ -424,6 +437,10 @@ router.post('/transaksi',checkNotAuthenticated, function(req, res, next) {
 	  });
 });
 
+
+
+
+
 router.get('/deletetransaksi/:id',checkNotAuthenticated, function(req, res, next) {  
 	var id = parseInt(req.params.id); // /detail/2, /detail/3
 	Transaksis.destroy({
@@ -439,6 +456,25 @@ router.get('/deletetransaksi/:id',checkNotAuthenticated, function(req, res, next
 		});
 	 });  
 });
+
+router.get('/bayar/:id',checkNotAuthenticated, async function(req, res, next) {
+  let id = req.params.id;
+  let transaksi = {
+    status: "Sudah Bayar"
+  }
+  const CariFoto = await Transaksis.findByPk(id);
+  await Fotos.update(transaksi,{where:{id:CariFoto.idpesanan}});
+  await Transaksis.update(transaksi, {where : {id: id}})
+  .then( data => {
+    res.redirect('/transaksi');
+  })
+  .catch(err => {
+    res.render('tokofoto', { 
+  title: 'Tambah Foto'
+    });
+  });
+});
+
 
 // view
 router.get("/webcam/", function (req, res, next) {

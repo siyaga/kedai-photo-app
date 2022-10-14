@@ -14,6 +14,9 @@ module.exports = (sequelize, Sequelize) => {
     },
     harga: {
       type: Sequelize.INTEGER,
+    },
+    status: {
+      type: Sequelize.STRING,
     }
   }, {
         
