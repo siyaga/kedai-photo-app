@@ -1,7 +1,10 @@
 module.exports = (sequelize, Sequelize) => {
 	const Transaksi = sequelize.define("transaksi", {
 		idpenjual: {
-			type: Sequelize.STRING
+			type: Sequelize.INTEGER
+		},	
+		idpembeli: {
+			type: Sequelize.INTEGER
 		},	
 		idpesanan: {
 			type: Sequelize.STRING

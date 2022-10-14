@@ -406,6 +406,7 @@ router.get('/transaksi',checkNotAuthenticated, function(req, res, next) {
 router.post('/transaksi',checkNotAuthenticated, function(req, res, next) {
 		let transaksi = {
       idpenjual: req.body.idpenjual,
+      idpembeli: req.body.idpembeli,
 		  idpesanan: req.body.id,
 		  gambar: req.body.gambar,
 		  judul: req.body.judul,

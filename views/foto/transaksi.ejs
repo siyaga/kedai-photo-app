@@ -16,7 +16,7 @@
                         </thead>
                         <tbody>
                             <%transaksis.forEach(function(item) {%>
-                            <% if(item.idpesanan == users.id ){ %> 
+                            <% if(item.idpembeli == users.id ){ %> 
                             <tr class="table-light">
                                 <th scope="row"><%=item.id %></th>
                                 <td><img src="../images/<%=item.gambar %>" width="70" height="100%" alt="<%=item.judul %>"/></td>
@@ -33,6 +33,23 @@
                                 </td>
                             </tr>
                             <% } %> 
+                            <% if(item.idpenjual == users.id ){ %> 
+                                <tr class="table-light">
+                                    <th scope="row"><%=item.id %></th>
+                                    <td><img src="../images/<%=item.gambar %>" width="70" height="100%" alt="<%=item.judul %>"/></td>
+                                    <td><%=item.judul %></td>
+                                    <td>Rp. <%=item.harga %></td>
+                                    <td><%=item.status %></td>
+                                    <td>
+                                        <% if (users.role=='pembeli') { %>
+                                            <button type="button" class="btn btn-outline-success">BAYAR</button>
+                                            <a href="/deletetransaksi/<%=item.id %>"  type="button" class="btn btn-outline-danger">HAPUS</a>
+                                        <% }else { %>
+                                            
+                                            <% } %>  
+                                    </td>
+                                </tr>
+                                <% } %> 
                            
                             <%});%>
                        
