@@ -16,12 +16,16 @@
                         </thead>
                         <tbody>
                             <%transaksis.forEach(function(item) {%>
+                                <%  
+					var reverse = (item.harga).toString().split("").reverse().join(""),
+					  ribuan = reverse.match(/\d{1,3}/g);
+					ribuan = ribuan.join(".").split("").reverse().join(""); %> 
                             <% if(item.idpembeli == users.id ){ %> 
                             <tr class="table-light">
                                 <th scope="row"><%=item.id %></th>
                                 <td><img src="../images/<%=item.gambar %>" width="70" height="100%" alt="<%=item.judul %>"/></td>
                                 <td><%=item.judul %></td>
-                                <td>Rp. <%=item.harga %></td>
+                                <td>Rp. <%=ribuan %></td>
                                 <td><%=item.status %></td>
                                 <td>
                                     <% if (users.role=='pembeli' && item.status == "Belum Bayar") { %>
@@ -38,7 +42,7 @@
                                     <th scope="row"><%=item.id %></th>
                                     <td><img src="../images/<%=item.gambar %>" width="70" height="100%" alt="<%=item.judul %>"/></td>
                                     <td><%=item.judul %></td>
-                                    <td>Rp. <%=item.harga %></td>
+                                    <td>Rp. <%=ribuan %></td>
                                     <td><%=item.status %></td>
                                     <td>
                                         <% if (users.role=='pembeli') { %>

@@ -185,9 +185,13 @@ router.post('/register',checkAuthenticated, [
 
 router.get('/profile',checkNotAuthenticated, async function (req, res, next) {
   const statusTransaksi = await Transaksis.findAll({where : { idpenjual : req.user.id, status : "Sudah Bayar" }});
-  const Pengeluaran = await Transaksis.findAll({where : { idpembeli : req.user.id, status : "Sudah Bayar" }, attributes:  ['harga'] });
-  const converProfit = [];
-  pengeluaran.foreach()
+  const Pengeluaran = await Transaksis.findAll({where : { idpembeli : req.user.id, status : "Sudah Bayar" }});
+  // console.log(statusTransaksi);
+  // let converProfit = [];
+  // await statusTransaksi.forEach(pengluaran=> {
+  //   converProfit.push(parseInt(pengluaran.harga));
+  // })
+  // console.log(converProfit);
 
   res.render('profile', {
     title: `Profile`,
@@ -336,20 +340,24 @@ router.get("/tokofoto/:page", function (req, res, next) {
 router.get("/tambahfoto",checkNotAuthenticated,penjualRoleIs, function (req, res, next) {
   res.render("foto/tambahfoto", { title: "Tambah Foto", users: authUser(req.user) });
 });
+
 router.post("/tambahfoto",checkNotAuthenticated,penjualRoleIs, kirim.array("gambar", 1), function (req, res, next) {
-//   var bilangan = req.body.harga;
-//   var reverse = bilangan.toString().split("").reverse().join(""),
-//     ribuan = reverse.match(/\d{1,3}/g);
-//   ribuan = ribuan.join(".").split("").reverse().join("");
+  // var bilangan = req.body.harga;
+  // var reverse = bilangan.toString().split("").reverse().join(""),
+  //   ribuan = reverse.match(/\d{1,3}/g);
+  // ribuan = ribuan.join(".").split("").reverse().join("");
 
   let gambar = req.files[0].filename;
+  let Harga = parseInt(req.body.harga)
+
   let foto = {
     iduser: req.user.id,
     judul: req.body.judul,
     deskripsi: req.body.deskripsi,
-    harga: req.body.harga,
+    harga: Harga,
     gambar: gambar,
   };
+  console.log(foto);
   Fotos.create(foto)
     .then((data) => {
       res.redirect("/");
