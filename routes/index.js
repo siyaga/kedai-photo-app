@@ -337,17 +337,17 @@ router.get("/tambahfoto",checkNotAuthenticated,penjualRoleIs, function (req, res
   res.render("foto/tambahfoto", { title: "Tambah Foto", users: authUser(req.user) });
 });
 router.post("/tambahfoto",checkNotAuthenticated,penjualRoleIs, kirim.array("gambar", 1), function (req, res, next) {
-  var bilangan = req.body.harga;
-  var reverse = bilangan.toString().split("").reverse().join(""),
-    ribuan = reverse.match(/\d{1,3}/g);
-  ribuan = ribuan.join(".").split("").reverse().join("");
+//   var bilangan = req.body.harga;
+//   var reverse = bilangan.toString().split("").reverse().join(""),
+//     ribuan = reverse.match(/\d{1,3}/g);
+//   ribuan = ribuan.join(".").split("").reverse().join("");
 
   let gambar = req.files[0].filename;
   let foto = {
     iduser: req.user.id,
     judul: req.body.judul,
     deskripsi: req.body.deskripsi,
-    harga: ribuan,
+    harga: req.body.harga,
     gambar: gambar,
   };
   Fotos.create(foto)
@@ -491,17 +491,17 @@ router.get("/editfoto/:id",checkNotAuthenticated,penjualRoleIs, function (req, r
 });
 router.post("/editfoto/:id",checkNotAuthenticated,penjualRoleIs, kirim.array("gambar", 1), function (req, res, next) {
   const id = parseInt(req.params.id);
-  var bilangan = req.body.harga;
-  var reverse = bilangan.toString().split("").reverse().join(""),
-    ribuan = reverse.match(/\d{1,3}/g);
-  ribuan = ribuan.join(".").split("").reverse().join("");
+//   var bilangan = req.body.harga;
+//   var reverse = bilangan.toString().split("").reverse().join(""),
+//     ribuan = reverse.match(/\d{1,3}/g);
+//   ribuan = ribuan.join(".").split("").reverse().join("");
 
   let gambar = req.files[0].filename;
   let foto = {
     iduser : req.user.id,
     judul: req.body.judul,
     deskripsi: req.body.deskripsi,
-    harga: ribuan,
+    harga: req.body.harga,
     gambar: gambar,
   };
   Fotos.update(foto, {
